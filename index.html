@@ -22,6 +22,12 @@ frame.addEventListener('load',()=>{
       const p=d.createElement('script');
       p.id='impresionModule';
       p.src='impresion.js?v=4';
+      p.onload=()=>{
+        const a=d.createElement('script');
+        a.id='altaModule';
+        a.src='alta.js?v=1';
+        d.body.appendChild(a);
+      };
       d.body.appendChild(p);
     };
     d.body.appendChild(s);
