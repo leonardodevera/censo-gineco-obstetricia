@@ -18,6 +18,12 @@ frame.addEventListener('load',()=>{
     const s=d.createElement('script');
     s.id='doctorasModule';
     s.src='doctoras.js?v=2';
+    s.onload=()=>{
+      const p=d.createElement('script');
+      p.id='impresionModule';
+      p.src='impresion.js?v=1';
+      d.body.appendChild(p);
+    };
     d.body.appendChild(s);
   }catch(e){console.error(e)}
 });
