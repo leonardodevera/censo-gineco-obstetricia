@@ -17,11 +17,11 @@ frame.addEventListener('load',()=>{
     if(!d||d.getElementById('doctorasModule'))return;
     const s=d.createElement('script');
     s.id='doctorasModule';
-    s.src='doctoras.js?v=2';
+    s.src='doctoras.js?v=3';
     s.onload=()=>{
       const p=d.createElement('script');
       p.id='impresionModule';
-      p.src='impresion.js?v=1';
+      p.src='impresion.js?v=2';
       d.body.appendChild(p);
     };
     d.body.appendChild(s);
