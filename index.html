@@ -15,7 +15,7 @@ frame.addEventListener('load',()=>{
   try{
     const d=frame.contentDocument;if(!d||d.getElementById('doctorasModule'))return;
     const load=(id,src,next)=>{const x=d.createElement('script');x.id=id;x.src=src;if(next)x.onload=next;d.body.appendChild(x)};
-    load('doctorasModule','doctoras.js?v=3',()=>load('impresionModule','impresion.js?v=4',()=>load('altaModule','alta.js?v=3',()=>load('procedimientosModule','procedimientos.js?v=1',()=>load('laboratoriosModule','laboratorios.js?v=3',()=>load('tabletFormModule','tablet-form.js?v=1'))))));
+    load('doctorasModule','doctoras.js?v=3',()=>load('impresionModule','impresion.js?v=4',()=>load('altaModule','alta.js?v=3',()=>load('procedimientosModule','procedimientos.js?v=1',()=>load('laboratoriosModule','laboratorios.js?v=3',()=>load('tabletFormModule','tablet-form.js?v=1',()=>load('smartMedsModule','medicacion-inteligente.js?v=1')))))));
   }catch(e){console.error(e)}
 });
 </script>
