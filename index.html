@@ -16,21 +16,15 @@ frame.addEventListener('load',()=>{
     const d=frame.contentDocument;
     if(!d||d.getElementById('doctorasModule'))return;
     const s=d.createElement('script');
-    s.id='doctorasModule';
-    s.src='doctoras.js?v=3';
+    s.id='doctorasModule';s.src='doctoras.js?v=3';
     s.onload=()=>{
-      const p=d.createElement('script');
-      p.id='impresionModule';
-      p.src='impresion.js?v=4';
+      const p=d.createElement('script');p.id='impresionModule';p.src='impresion.js?v=4';
       p.onload=()=>{
-        const a=d.createElement('script');
-        a.id='altaModule';
-        a.src='alta.js?v=3';
+        const a=d.createElement('script');a.id='altaModule';a.src='alta.js?v=3';
+        a.onload=()=>{const r=d.createElement('script');r.id='procedimientosModule';r.src='procedimientos.js?v=1';d.body.appendChild(r)};
         d.body.appendChild(a);
-      };
-      d.body.appendChild(p);
-    };
-    d.body.appendChild(s);
+      };d.body.appendChild(p);
+    };d.body.appendChild(s);
   }catch(e){console.error(e)}
 });
 </script>
