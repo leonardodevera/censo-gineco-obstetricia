@@ -1,0 +1,7 @@
+(()=>{
+function selectedEntry(){if(selected===null)return null;let entries=sortedEntries(beds[selected]);return entries[activeLab]||null}
+async function removeEntry(){let e=selectedEntry();if(!e)return;if(!confirm('¿Eliminar esta toma de laboratorio?'))return;let b=beds[selected],idx=b.labEntries.indexOf(e);if(idx<0)idx=b.labEntries.findIndex(x=>x===e||(e.id&&x.id===e.id));if(idx<0)return;setCloudStatus?.('saving');try{if(e.id){let {error}=await sb.from('lab_entries').delete().eq('id',e.id);if(error)throw error}b.labEntries.splice(idx,1);activeLab=0;renderLabTabs();setCloudStatus?.('saved')}catch(err){console.error(err);setCloudStatus?.('error')}}
+function addButton(){let view=document.getElementById('labView');if(!view)return;let e=selectedEntry(),old=document.getElementById('deleteLabEntry');if(old)old.remove();if(!e)return;let btn=document.createElement('button');btn.type='button';btn.id='deleteLabEntry';btn.textContent='✕ Eliminar esta toma';btn.style.cssText='margin:8px 0 2px;padding:7px 9px;font-size:11px;color:#b42318;background:#fff3f3;border-color:#fecaca';btn.onclick=removeEntry;view.insertBefore(btn,view.firstChild.nextSibling)}
+function install(){if(typeof renderLabTabs!=='function')return false;let original=renderLabTabs;renderLabTabs=function(){original();addButton()};if(selected!==null)renderLabTabs();return true}
+let n=0,t=setInterval(()=>{if(install()||++n>30)clearInterval(t)},100);
+})();
