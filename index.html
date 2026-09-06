@@ -13,18 +13,9 @@
 const frame=document.getElementById('app');
 frame.addEventListener('load',()=>{
   try{
-    const d=frame.contentDocument;
-    if(!d||d.getElementById('doctorasModule'))return;
-    const s=d.createElement('script');
-    s.id='doctorasModule';s.src='doctoras.js?v=3';
-    s.onload=()=>{
-      const p=d.createElement('script');p.id='impresionModule';p.src='impresion.js?v=4';
-      p.onload=()=>{
-        const a=d.createElement('script');a.id='altaModule';a.src='alta.js?v=3';
-        a.onload=()=>{const r=d.createElement('script');r.id='procedimientosModule';r.src='procedimientos.js?v=1';d.body.appendChild(r)};
-        d.body.appendChild(a);
-      };d.body.appendChild(p);
-    };d.body.appendChild(s);
+    const d=frame.contentDocument;if(!d||d.getElementById('doctorasModule'))return;
+    const load=(id,src,next)=>{const x=d.createElement('script');x.id=id;x.src=src;if(next)x.onload=next;d.body.appendChild(x)};
+    load('doctorasModule','doctoras.js?v=3',()=>load('impresionModule','impresion.js?v=4',()=>load('altaModule','alta.js?v=3',()=>load('procedimientosModule','procedimientos.js?v=1',()=>load('laboratoriosModule','laboratorios.js?v=1')))));
   }catch(e){console.error(e)}
 });
 </script>
