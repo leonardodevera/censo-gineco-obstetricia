@@ -2,8 +2,9 @@
  const s=document.createElement('style');
  s.id='pregnantColorModuleStyle';
  s.textContent=`
- #beds .bed.pregActualOccupied{background:#e5f1ff!important;border-color:#75a7df!important}
- #beds .bed.pregActualOccupied:hover{background:#dcecff!important}
+ #beds .bed.actualPreg{background:#fff3cd!important;border-color:#e6b800!important}
+ #beds .bed.actualPuer{background:#ffe0ec!important;border-color:#d94f8a!important}
+ #beds .bed.actualGyn{background:#dceeff!important;border-color:#3986c6!important}
  #beds .bed.actualAvailable{background:#f0fbf4!important;border-color:#86d3a2!important}
  #beds .bed.actualBlocked{background:#eef0f3!important;border-color:#9299a3!important;box-shadow:none!important}
  `;
@@ -18,10 +19,13 @@
    if(!grid||!Array.isArray(beds))return;
    grid.querySelectorAll('.bed').forEach(card=>{
      const b=bedFor(card);if(!b)return;
-     const blocked=!b.name&&b.proc===BLOCK_MARK;
-     const available=!b.name&&!blocked;
-     const pregOccupied=!!b.name&&b.type==='preg';
-     card.classList.toggle('pregActualOccupied',pregOccupied);
+     const occupied=!!b.name;
+     const blocked=!occupied&&b.proc===BLOCK_MARK;
+     const available=!occupied&&!blocked;
+     card.classList.remove('pregActualOccupied','actualPreg','actualPuer','actualGyn','actualAvailable','actualBlocked');
+     card.classList.toggle('actualPreg',occupied&&b.type==='preg');
+     card.classList.toggle('actualPuer',occupied&&b.type==='puer');
+     card.classList.toggle('actualGyn',occupied&&b.type==='gyn');
      card.classList.toggle('actualAvailable',available);
      card.classList.toggle('actualBlocked',blocked);
    });
