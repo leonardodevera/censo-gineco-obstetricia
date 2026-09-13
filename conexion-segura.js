@@ -16,3 +16,16 @@ new MutationObserver(()=>{if(offline)lockForm()}).observe(document.body,{childLi
 setInterval(checkConnection,20000);
 setTimeout(checkConnection,2500);
 })();
+
+(()=>{
+const form=$('form');if(!form||$('cedula'))return;
+const hc=$('hc');const label=hc&&hc.closest('label');if(!label)return;
+const ced=document.createElement('label');ced.innerHTML='Cédula<input id="cedula" inputmode="numeric" autocomplete="off" placeholder="Número de cédula">';label.insertAdjacentElement('afterend',ced);
+const prevMap=mapBedRow;mapBedRow=function(r,i){const b=prevMap(r,i);b.cedula=r.cedula||'';b.admission_at=r.admission_at||null;return b};
+const prevPayload=bedPayload;bedPayload=function(b){return {...prevPayload(b),cedula:b.cedula||null,admission_at:b.admission_at||null}};
+async function hydrate(){try{const {data,error}=await sb.from('beds').select('id,cedula,admission_at');if(error||!Array.isArray(data))return;const m=new Map(data.map(r=>[String(r.id),r]));beds.forEach(b=>{const r=m.get(String(b.id));if(r){b.cedula=r.cedula||'';b.admission_at=r.admission_at||null}});fill()}catch(e){console.error(e)}}
+function fill(){if(selected===null||!beds[selected])return;$('cedula').value=beds[selected].cedula||''}
+form.addEventListener('submit',()=>{if(selected===null||!beds[selected])return;const b=beds[selected],t=$('type').value;b.cedula=$('cedula').value.trim();if(!b.type&&t&&!b.admission_at)b.admission_at=new Date().toISOString()},true);
+let ls=-2,lo=false;setInterval(()=>{const o=$('modal')&&$('modal').style.display!=='none';if(o&&(!lo||ls!==selected))fill();lo=o;ls=selected},120);
+setTimeout(hydrate,800);
+})();
