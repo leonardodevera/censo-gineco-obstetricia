@@ -1,6 +1,7 @@
 (()=>{
 function alta(b){try{const p=String(b.plan||'');return p.startsWith('ALTA_JSON:')&&!!JSON.parse(p.slice(10)).alta}catch(e){return false}}
 function fmtFecha(v){if(!v)return '';const d=new Date(v);if(isNaN(d))return '';return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()}
+function hoy(){const d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()}
 function d0(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
 function dias(v){if(!v)return '';const d=new Date(v);return isNaN(d)?'':Math.max(0,Math.floor((d0(new Date())-d0(d))/86400000))}
 function cie(b){return b.birthType==='parto'?'O80.9':b.birthType==='cesarea'?'O82.1':''}
@@ -18,7 +19,7 @@ function guardar(){
  let xmlRows='';
  const top=[
   ['INSTITUTO ECUATORIANO DE SEGURIDAD SOCIAL','Código:','FO-SH-HO-002'],
-  ['HOSPITAL GENERAL DEL NORTE DE GUAYAQUIL LOS CEIBOS','Fecha:','1/1/2026'],
+  ['HOSPITAL GENERAL DEL NORTE DE GUAYAQUIL LOS CEIBOS','Fecha:',hoy()],
   ['SERVICIOS HOSPITALARIOS','Versión:','1']
  ];
  top.forEach((r,i)=>{const rr=i+1;xmlRows+='<row r="'+rr+'" ht="21" customHeight="1">'+cell('A'+rr,r[0],3)+cell('I'+rr,r[1],4)+cell('J'+rr,r[2],4)+'</row>'});
