@@ -39,10 +39,11 @@ function section(scope,list,label,breakBefore){
 }
 function hospitalPrint(){
  const scope=selectedScope(),occ=scope.list.filter(b=>b.type);
- const firstIds=new Set(BED_IDS.slice(0,40));
+ const cut=BED_IDS.indexOf('6011-B');
+ const firstIds=new Set(BED_IDS.slice(0,cut+1));
  const first=occ.filter(b=>firstIds.has(b.id));
  const second=occ.filter(b=>!firstIds.has(b.id));
- return section(scope,first,'CAMAS 601–6011-B',false)+section(scope,second,'CAMAS 612–622-D',true);
+ return section(scope,first,'CAMAS 601–611-B',false)+section(scope,second,'CAMAS 612–622-D',true);
 }
 function addPrintStyle(){if(document.getElementById('hospitalPrintStyle'))return;const s=document.createElement('style');s.id='hospitalPrintStyle';s.textContent=`
 .pdfSheet.hospitalSheet{width:297mm!important;min-height:210mm!important;padding:0!important;background:transparent!important;box-shadow:none!important}.handoffPage{box-sizing:border-box;width:297mm;min-height:210mm;padding:6mm;background:#fff;margin:0 auto 8mm;box-shadow:0 2px 12px #0002}.hospitalPrintHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-end;border-bottom:1.2px solid #111;padding-bottom:3px;margin-bottom:4px;font-size:7.5pt}.hospitalPrintHead>b{font-size:10pt}.hospitalPrint{width:100%;border-collapse:collapse;table-layout:fixed;font-size:6.8pt;line-height:1.15;color:#111}.hospitalPrint th,.hospitalPrint td{border:.6px solid #555;padding:2.2px 3px;vertical-align:top;overflow-wrap:anywhere}.hospitalPrint th{font-size:6.6pt;text-transform:uppercase;text-align:center;background:#f1f1f1}.hospitalPrint thead{display:table-header-group}.hospitalPrint tr{break-inside:avoid;page-break-inside:avoid}.hospitalPrint .sectionRow td{font-weight:900;font-size:7.2pt;padding:2px 4px;background:#e8e8e8}.hospitalPrint .bedCell{text-align:center;font-size:7.4pt}.hospitalPrint .wBed{width:5%}.hospitalPrint .wPatient{width:14%}.hospitalPrint .wDx{width:18%}.hospitalPrint .wEvent{width:10%}.hospitalPrint .wLabs{width:17%}.hospitalPrint .wMeds{width:20%}.hospitalPrint .wTasks{width:16%}.printFlags{font-weight:800;margin-top:2px;font-size:6.2pt}.printOver{font-weight:700}.printEmpty{text-align:center;padding:12px!important}
