@@ -1,43 +1,40 @@
 (()=>{
-function pendingCount(){
- try{
-  if(typeof selected==='undefined'||selected===null||!beds[selected])return 0;
-  return (beds[selected].tasks||[]).filter(t=>taskStatus(t)!=='done').length;
- }catch(e){return 0}
+function currentBed(){try{return typeof selected!=='undefined'&&selected!==null?beds[selected]:null}catch(e){return null}}
+function pendingCount(){const b=currentBed();return b?(b.tasks||[]).filter(t=>taskStatus(t)!=='done').length:0}
+function updateButton(){const b=document.getElementById('quickPendingBtn');if(!b)return;const n=pendingCount();b.textContent='📌 Pendientes'+(n?' ('+n+')':'');b.classList.toggle('hasPending',n>0)}
+function closeQuick(){const m=document.getElementById('quickPendingModal');if(m)m.style.display='none'}
+function renderQuick(){
+ const b=currentBed(),list=document.getElementById('quickPendingList');if(!b||!list)return;
+ const tasks=(b.tasks||[]).map((t,i)=>({t,i})).filter(x=>taskStatus(x.t)!=='done');
+ list.innerHTML='';
+ if(!tasks.length){list.innerHTML='<div class="quickPendingEmpty">Sin pendientes activos.</div>';updateButton();return}
+ tasks.forEach(({t,i})=>{
+  const st=taskStatus(t),row=document.createElement('div');row.className='quickPendingItem '+(st==='overdue'?'isOverdue':'');
+  const check=document.createElement('input');check.type='checkbox';check.title='Marcar como realizado';
+  check.onchange=()=>{if(!check.checked)return;t.done=true;save();renderTasks();render();renderQuick()};
+  const txt=document.createElement('div');txt.className='quickPendingText';txt.innerHTML=(st==='overdue'?'<b class="quickOverdue">VENCIDO</b> ':'')+'<b>'+esc(t.text||'Pendiente')+'</b>'+((t.date||t.time)?'<div class="quickPendingWhen">'+[t.date?fmtDate(t.date):'',t.time||''].filter(Boolean).join(' · ')+'</div>':'')+(t.note?'<div class="quickPendingNote">'+esc(t.note)+'</div>':'');
+  const del=document.createElement('button');del.type='button';del.className='quickPendingDelete';del.textContent='✕';del.title='Eliminar pendiente';del.onclick=()=>{if(!confirm('¿Eliminar este pendiente? Úsalo si fue ingresado por error.'))return;b.tasks.splice(i,1);save();renderTasks();render();renderQuick()};
+  row.append(check,txt,del);list.appendChild(row);
+ });updateButton();
 }
-function updateButton(){
- const b=document.getElementById('quickPendingBtn');if(!b)return;
- const n=pendingCount();
- b.textContent='📌 Pendientes'+(n?' ('+n+')':'');
- b.classList.toggle('hasPending',n>0);
+function addQuick(){
+ const b=currentBed();if(!b)return;
+ const text=document.getElementById('quickPendingText').value.trim();if(!text)return;
+ const date=document.getElementById('quickPendingDate').value,time=document.getElementById('quickPendingTime').value;
+ b.tasks.push({id:null,text,date,time,done:false,note:''});
+ document.getElementById('quickPendingText').value='';document.getElementById('quickPendingDate').value='';document.getElementById('quickPendingTime').value='';
+ save();renderTasks();render();renderQuick();document.getElementById('quickPendingText').focus();
 }
-function goPending(){
- const target=document.getElementById('taskText');if(!target)return;
- const box=target.closest('.full')||target.parentElement||target;
- box.scrollIntoView({behavior:'smooth',block:'start'});
- setTimeout(()=>target.focus({preventScroll:true}),350);
-}
+function openQuick(){const b=currentBed();if(!b)return;document.getElementById('quickPendingTitle').textContent='📌 Pendientes · Cama '+b.id;renderQuick();document.getElementById('quickPendingModal').style.display='flex'}
 function install(){
- const panel=document.querySelector('#modal .panel'),head=document.querySelector('#modal .head'),form=document.getElementById('form'),task=document.getElementById('taskText');
- if(!panel||!head||!form||!task)return false;
- if(!document.getElementById('quickPendingStyle')){
-  const s=document.createElement('style');s.id='quickPendingStyle';s.textContent=`
-  .quickPatientNav{padding:8px 14px 0;background:#fff;position:sticky;top:0;z-index:2}
-  .quickPatientNav button{padding:8px 12px;font-size:12px;font-weight:800;border-radius:999px;border:1px solid #cbd5e1;background:#f8fafc;color:#334155}
-  .quickPatientNav button.hasPending{background:#fff7d6;border-color:#e5b700;color:#7a5200}
-  `;document.head.appendChild(s);
- }
- if(!document.getElementById('quickPendingBtn')){
-  const nav=document.createElement('div');nav.className='quickPatientNav';
-  const b=document.createElement('button');b.type='button';b.id='quickPendingBtn';b.onclick=goPending;
-  nav.appendChild(b);head.insertAdjacentElement('afterend',nav);
- }
- updateButton();
- const mo=new MutationObserver(()=>{if(document.getElementById('modal').style.display==='block')updateButton()});
- mo.observe(document.getElementById('modal'),{attributes:true,attributeFilter:['style'],subtree:false});
- document.getElementById('form').addEventListener('change',()=>setTimeout(updateButton,80));
- document.getElementById('form').addEventListener('click',()=>setTimeout(updateButton,80));
- return true;
+ const head=document.querySelector('#modal .head'),form=document.getElementById('form');if(!head||!form||!document.getElementById('taskText'))return false;
+ if(!document.getElementById('quickPendingStyle')){const s=document.createElement('style');s.id='quickPendingStyle';s.textContent=`
+ .quickPatientNav{padding:8px 14px 0;background:#fff;position:sticky;top:0;z-index:2}.quickPatientNav button{padding:8px 12px;font-size:12px;font-weight:800;border-radius:999px;border:1px solid #cbd5e1;background:#f8fafc;color:#334155}.quickPatientNav button.hasPending{background:#fff7d6;border-color:#e5b700;color:#7a5200}
+ .quickPendingModal{display:none;position:fixed;inset:0;z-index:90;background:#0008;align-items:flex-start;justify-content:center;padding:18px 10px;overflow:auto}.quickPendingPanel{width:min(620px,100%);background:#fff;border-radius:16px;box-shadow:0 18px 50px #0005;overflow:hidden}.quickPendingHead{display:flex;align-items:center;gap:8px;padding:13px 14px;border-bottom:1px solid #e2e8f0}.quickPendingHead strong{flex:1}.quickPendingHead button{padding:7px 10px}.quickPendingBody{padding:12px}.quickPendingAdd{display:grid;grid-template-columns:1fr 145px 110px auto;gap:6px;margin-bottom:12px}.quickPendingAdd input{min-width:0;border:1px solid #cbd5e1;border-radius:9px;padding:9px;font-size:14px}.quickPendingAdd button{background:#1f5fbf;color:#fff;border-color:#1f5fbf;font-weight:800}.quickPendingItem{display:flex;gap:9px;align-items:flex-start;padding:10px 6px;border-top:1px solid #dbe3ee}.quickPendingItem:first-child{border-top:0}.quickPendingItem>input{width:20px;height:20px;margin-top:2px;flex:none}.quickPendingText{flex:1;font-size:13px;line-height:1.35}.quickPendingWhen{font-size:11px;color:#64748b;margin-top:3px}.quickPendingNote{font-size:11px;margin-top:5px;padding:5px 7px;background:#fff7ed;border-radius:7px}.quickOverdue{color:#b42318;font-size:10px}.quickPendingDelete{padding:5px 8px;color:#b42318;border-color:#fecaca}.quickPendingEmpty{text-align:center;color:#64748b;padding:20px 8px}@media(max-width:600px){.quickPendingAdd{grid-template-columns:1fr 1fr}.quickPendingAdd #quickPendingText{grid-column:1/-1}.quickPendingAdd button{grid-column:1/-1}.quickPendingModal{padding-top:10px}}
+ `;document.head.appendChild(s)}
+ if(!document.getElementById('quickPendingBtn')){const nav=document.createElement('div');nav.className='quickPatientNav';const b=document.createElement('button');b.type='button';b.id='quickPendingBtn';b.onclick=openQuick;nav.appendChild(b);head.insertAdjacentElement('afterend',nav)}else document.getElementById('quickPendingBtn').onclick=openQuick;
+ if(!document.getElementById('quickPendingModal')){const m=document.createElement('div');m.id='quickPendingModal';m.className='quickPendingModal';m.innerHTML='<div class="quickPendingPanel"><div class="quickPendingHead"><strong id="quickPendingTitle">📌 Pendientes</strong><button type="button" id="quickPendingClose">✕</button></div><div class="quickPendingBody"><div class="quickPendingAdd"><input id="quickPendingText" placeholder="Nuevo pendiente"><input id="quickPendingDate" type="date"><input id="quickPendingTime" type="time"><button type="button" id="quickPendingAdd">Agregar</button></div><div id="quickPendingList"></div></div></div>';document.body.appendChild(m);document.getElementById('quickPendingClose').onclick=closeQuick;document.getElementById('quickPendingAdd').onclick=addQuick;document.getElementById('quickPendingText').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addQuick()}});m.addEventListener('click',e=>{if(e.target===m)closeQuick()})}
+ updateButton();const mo=new MutationObserver(()=>{if(document.getElementById('modal').style.display==='block')updateButton();else closeQuick()});mo.observe(document.getElementById('modal'),{attributes:true,attributeFilter:['style']});form.addEventListener('change',()=>setTimeout(updateButton,80));form.addEventListener('click',()=>setTimeout(updateButton,80));return true
 }
 let n=0,t=setInterval(()=>{if(install()||++n>40)clearInterval(t)},100);
 })();
